@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+/* ───────────────────────────────────────────────
+   DevBrain · Sistema "Synapse"
+   Constelación de decisiones conectadas sobre índigo profundo.
+   Bricolage Grotesque (display) · Hanken Grotesk (texto) · IBM Plex Mono (datos)
+   ─────────────────────────────────────────────── */
+@theme {
+  --color-void: #08091a;
+  --color-surface: #11132b;
+  --color-surface-2: #171a38;
+  --color-text: #eaebf5;
+  --color-muted: #8e92b0;
+  --color-faint: #5b5f80;
+
+  --color-iris: #7b7bff;
+  --color-teal: #2fe6c8;
+  --color-amber: #ffb454;
+  --color-rose: #ff6e8a;
+
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-sans: 'Hanken Grotesk', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --animate-pulse-node: pulse-node 3.2s ease-in-out infinite;
+  --animate-drift: drift 9s ease-in-out infinite;
+}
+
+@keyframes pulse-node {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-void);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-iris) 35%, transparent);
+    color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}

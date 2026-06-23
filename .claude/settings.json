@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue *)",
+      "PowerShell(gh issue list --state open)",
+      "PowerShell(gh issue view 1)",
+      "PowerShell(gh issue view 2)",
+      "PowerShell(gh issue view 3)",
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(cd \"C:/Users/Jess/OneDrive/Desktop/managrx/managrx-fe\")",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('engines:', JSON.stringify\\(p.engines||'none'\\)\\); const d={...p.dependencies,...p.devDependencies}; for \\(const k of ['vite','vue','@vitejs/plugin-vue','svelte','@sveltejs/kit','react','next','tailwindcss']\\) if\\(d[k]\\) console.log\\(k, d[k]\\);\")",
+      "Bash(cat .nvmrc)",
+      "Read(//c/Users/Jess/OneDrive/Desktop/managrx/managrx-fe/**)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('scripts:', JSON.stringify\\(p.scripts,null,1\\)\\); const d={...p.dependencies,...p.devDependencies}; for \\(const k of Object.keys\\(d\\)\\) if\\(/vue-cli|webpack|cli-service|node-sass|sass|vite|nuxt/.test\\(k\\)\\) console.log\\(k, d[k]\\);\")",
+      "PowerShell(winget install CoreyButler.NVMforWindows --accept-source-agreements --accept-package-agreements 2>&1)",
+      "Bash(printf '20.18.0\\\\n' > \"c:/Users/Jess/OneDrive/Desktop/Dev/DevBrain-FrontEnd/.nvmrc\" *)",
+      "Read(//c/Users/Jess/AppData/Local/Packages/5319275A.WhatsAppDesktop_cv1g1gvanyjgm/LocalState/sessions/3FA2DA5AA5FF321F578654E667721EC0E7A71E74/transfers/2026-25/**)",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $_.CommandLine -match '4318|vite preview' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force; \"detenido PID $\\($_.ProcessId\\)\" })",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object { $_.CommandLine -match '4320|vite preview' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force; \"detenido PID $\\($_.ProcessId\\)\" })",
+      "Bash(git commit -q --amend -m ' *)",
+      "Bash(git reset *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Jess\\OneDrive\\Desktop\\managrx\\managrx-fe"
+    ]
+  }
+}
