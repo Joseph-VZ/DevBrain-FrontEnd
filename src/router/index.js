@@ -42,6 +42,30 @@ const router = createRouter({
       component: () => import('@/views/projects/ProjectFormView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/projects/:projectId/timeline',
+      name: 'project-timeline',
+      component: () => import('@/views/decisions/TimelineView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/projects/:projectId/decisions/new',
+      name: 'decision-create',
+      component: () => import('@/views/decisions/DecisionFormView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/projects/:projectId/decisions/:decisionId',
+      name: 'decision-detail',
+      component: () => import('@/views/decisions/DecisionDetailView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/invitations/accept',
+      name: 'invitation-accept',
+      component: () => import('@/views/invitations/AcceptInvitationView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

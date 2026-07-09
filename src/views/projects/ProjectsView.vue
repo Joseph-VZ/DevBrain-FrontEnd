@@ -142,7 +142,15 @@ onMounted(loadProjects)
       </div>
 
       <div v-else-if="projects.length" class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <article v-for="project in projects" :key="project.id" class="project-card">
+        <article
+          v-for="project in projects"
+          :key="project.id"
+          class="project-card"
+          role="button"
+          tabindex="0"
+          @click="router.push({ name: 'project-timeline', params: { projectId: project.id } })"
+          @keydown.enter="router.push({ name: 'project-timeline', params: { projectId: project.id } })"
+        >
           <div class="flex items-start justify-between gap-4">
             <span class="project-icon">{{ String(project.name || 'P').slice(0, 1).toUpperCase() }}</span>
             <span class="project-chip">Activo</span>
@@ -292,8 +300,13 @@ onMounted(loadProjects)
   color: var(--color-text);
 }
 .project-card {
+  cursor: pointer;
   padding: 1.25rem;
   transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+.project-card:focus-visible {
+  outline: 2px solid var(--color-iris);
+  outline-offset: 2px;
 }
 .project-card:hover {
   transform: translateY(-4px);
