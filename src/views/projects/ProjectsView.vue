@@ -162,9 +162,23 @@ onMounted(loadProjects)
           </p>
 
           <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
-            <span class="font-mono text-xs uppercase tracking-[0.14em] text-faint">ID #{{ project.id }}</span>
-            <span class="text-sm font-semibold text-iris">Ver memoria</span>
-          </div>
+            <span class="font-mono text-xs uppercase tracking-[0.14em] text-faint">
+              ID #{{ project.id }}
+            </span>
+          <div class="flex gap-3">
+
+    <RouterLink
+    class="text-sm font-semibold text-teal hover:underline"
+    :to="{
+    name: 'project-ai',
+    params: { projectId: project.id }}"
+    @click.stop
+    >🤖 Consultar IA
+    </RouterLink>
+
+  </div>
+
+</div>
         </article>
       </div>
 
