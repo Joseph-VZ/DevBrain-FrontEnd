@@ -119,8 +119,10 @@ const statusMeta = {
 }
 
 function statusFor(decision) {
-  return statusMeta[decision.estado] || statusMeta.pendiente
+  return statusMeta[decision.status] || statusMeta.pendiente
 }
+
+const searchQuery = ref('')
 
 async function loadTimeline() {
   isLoading.value = true
@@ -128,7 +130,7 @@ async function loadTimeline() {
 
   try {
     const [decisionsResponse, projectsResponse] = await Promise.all([
-      decisionService.getDecisions(projectId.value),
+      decisionService.getDecisions(projectId.value, searchQuery.value.trim()),
       projectService.getProjects().catch(() => ({ data: [] })),
     ])
 
@@ -275,11 +277,24 @@ onMounted(loadTimeline)
         </RouterLink>
       </div>
 
-      <div class="mt-8 flex items-end justify-between">
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <h2 class="font-display text-2xl font-bold">
           {{ decisions.length }} {{ decisions.length === 1 ? 'decisión' : 'decisiones' }}
         </h2>
-        <button class="refresh-btn" type="button" @click="loadTimeline">Actualizar</button>
+        <div class="flex gap-2">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input
+              v-model="searchQuery"
+              class="search-input"
+              type="search"
+              placeholder="¿Por qué elegimos...?"
+              @keyup.enter="loadTimeline"
+              @search="loadTimeline"
+            />
+          </div>
+          <button class="refresh-btn" type="button" @click="loadTimeline">Buscar</button>
+        </div>
       </div>
 
       <p v-if="errorMessage" class="alert-error mt-6">{{ errorMessage }}</p>
@@ -312,9 +327,13 @@ onMounted(loadTimeline)
             <p class="mt-3 line-clamp-2 text-sm leading-relaxed text-muted">{{ decision.description }}</p>
 
             <div class="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
-              <span class="font-mono text-xs uppercase tracking-[0.14em] text-faint">
-                {{ (decision.alternatives || []).length }} alternativas
-              </span>
+              <div class="flex items-center gap-3 font-mono text-xs text-faint">
+                <span class="uppercase tracking-[0.14em]">
+                  {{ (decision.alternatives || []).length }} alt.
+                </span>
+                <span class="vote-pill approve">▲ {{ decision.votes?.approve ?? 0 }}</span>
+                <span class="vote-pill reject">▼ {{ decision.votes?.reject ?? 0 }}</span>
+              </div>
               <span class="text-sm font-semibold text-iris">Ver decisión →</span>
             </div>
           </article>
@@ -397,6 +416,42 @@ onMounted(loadTimeline)
 .refresh-btn:hover {
   border-color: rgba(255, 255, 255, 0.28);
   color: var(--color-text);
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 9, 26, 0.6);
+  padding: 0 0.85rem;
+}
+.search-box:focus-within {
+  border-color: var(--color-iris);
+}
+.search-icon {
+  color: var(--color-faint);
+  font-size: 1.1rem;
+}
+.search-input {
+  width: min(16rem, 60vw);
+  border: none;
+  background: transparent;
+  padding: 0.7rem 0;
+  color: var(--color-text);
+  outline: none;
+}
+.vote-pill {
+  border-radius: 9999px;
+  padding: 0.15rem 0.5rem;
+}
+.vote-pill.approve {
+  background: rgba(47, 230, 200, 0.1);
+  color: var(--color-teal);
+}
+.vote-pill.reject {
+  background: rgba(255, 110, 138, 0.1);
+  color: var(--color-rose);
 }
 .timeline {
   position: relative;

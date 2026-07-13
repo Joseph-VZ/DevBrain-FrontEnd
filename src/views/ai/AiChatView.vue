@@ -71,6 +71,21 @@
               {{ message.content }}
             </p>
 
+            <div
+              v-if="message.sources && message.sources.length"
+              class="mt-3 flex flex-wrap gap-2 border-t border-white/10 pt-2"
+            >
+              <button
+                v-for="source in message.sources"
+                :key="source.id"
+                type="button"
+                class="rounded-full border border-[var(--color-iris)]/40 bg-[var(--color-iris)]/10 px-2.5 py-1 text-xs font-semibold text-[var(--color-iris)] transition hover:bg-[var(--color-iris)]/20"
+                @click="goToSource(source.id)"
+              >
+                #{{ source.id }} · {{ source.title }}
+              </button>
+            </div>
+
           </div>
 
         </div>
@@ -130,13 +145,22 @@
 
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import { queryAI } from '@/services/aiService'
 
 
 // Router
 const route = useRoute()
+const router = useRouter()
+
+// Navega al detalle de una decisión citada por la IA
+const goToSource = (decisionId) => {
+  router.push({
+    name: 'decision-detail',
+    params: { projectId, decisionId },
+  })
+}
 
 
 // ID del proyecto desde la URL
@@ -198,6 +222,7 @@ const sendQuestion = async () => {
     messages.value.push({
       role: 'assistant',
       content: response.answer,
+      sources: response.sources || [],
     })
 
 

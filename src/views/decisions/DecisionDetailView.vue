@@ -20,6 +20,11 @@ const myVote = ref(null)
 // Conteo real proveniente del backend (GET /votes).
 const counts = ref({ approve: 0, reject: 0 })
 
+// Comentarios / discusión
+const comments = ref([])
+const newComment = ref('')
+const isPosting = ref(false)
+
 const hasVoted = computed(() => Boolean(myVote.value))
 const totalVotes = computed(() => counts.value.approve + counts.value.reject)
 
@@ -41,6 +46,12 @@ const formattedDate = computed(() => {
   return Number.isNaN(date.getTime()) ? '' : dateFormatter.format(date)
 })
 
+function commentDate(value) {
+  if (!value) return ''
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? '' : dateFormatter.format(date)
+}
+
 async function loadVotes() {
   try {
     const { data } = await decisionService.getVotes(decisionId.value)
@@ -48,6 +59,31 @@ async function loadVotes() {
     myVote.value = data.myVote
   } catch {
     // Si falla el conteo no bloqueamos la vista del detalle.
+  }
+}
+
+async function loadComments() {
+  try {
+    const { data } = await decisionService.getComments(decisionId.value)
+    comments.value = data
+  } catch {
+    // Los comentarios no son críticos para mostrar el detalle.
+  }
+}
+
+async function postComment() {
+  const content = newComment.value.trim()
+  if (!content || isPosting.value) return
+
+  isPosting.value = true
+  try {
+    const { data } = await decisionService.addComment(decisionId.value, content)
+    comments.value.push(data)
+    newComment.value = ''
+  } catch (error) {
+    errorMessage.value = error.response?.data?.error || 'No se pudo publicar el comentario.'
+  } finally {
+    isPosting.value = false
   }
 }
 
@@ -64,7 +100,7 @@ async function loadDecision() {
     }
 
     decision.value = data
-    await loadVotes()
+    await Promise.all([loadVotes(), loadComments()])
   } catch (error) {
     errorMessage.value = error.response?.data?.error || 'No se pudo cargar la decisión.'
   } finally {
@@ -95,6 +131,8 @@ async function submitVote(vote) {
     isVoting.value = false
   }
 }
+
+onMounted(loadDecision)
 </script>
 
 <template>
@@ -185,6 +223,33 @@ async function submitVote(vote) {
           <p v-else-if="hasVoted" class="mt-4 text-sm text-muted">
             Ya emitiste tu voto en esta decisión. Los botones quedaron deshabilitados.
           </p>
+        </article>
+
+        <article class="panel mt-5">
+          <h2 class="section-title">Discusión ({{ comments.length }})</h2>
+
+          <ul v-if="comments.length" class="mt-4 space-y-3">
+            <li v-for="comment in comments" :key="comment.id" class="comment">
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-sm font-semibold text-text">{{ comment.author?.name || 'Miembro' }}</span>
+                <span class="font-mono text-xs text-faint">{{ commentDate(comment.createdAt) }}</span>
+              </div>
+              <p class="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-muted">{{ comment.content }}</p>
+            </li>
+          </ul>
+          <p v-else class="mt-3 text-sm text-muted">Aún no hay comentarios. Abre la discusión.</p>
+
+          <form class="mt-4 flex flex-col gap-2" @submit.prevent="postComment">
+            <textarea
+              v-model="newComment"
+              class="comment-input"
+              rows="3"
+              placeholder="Comparte tu punto de vista sobre esta decisión..."
+            ></textarea>
+            <button class="comment-btn self-end" type="submit" :disabled="isPosting || !newComment.trim()">
+              {{ isPosting ? 'Publicando...' : 'Comentar' }}
+            </button>
+          </form>
         </article>
       </template>
     </section>
@@ -335,5 +400,37 @@ async function submitVote(vote) {
   background: rgba(47, 230, 200, 0.1);
   padding: 0.85rem 1rem;
   color: var(--color-teal);
+}
+.comment {
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 9, 26, 0.5);
+  padding: 0.85rem 1rem;
+}
+.comment-input {
+  width: 100%;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(8, 9, 26, 0.78);
+  padding: 0.8rem 0.95rem;
+  color: var(--color-text);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.18s ease;
+}
+.comment-input:focus {
+  border-color: var(--color-iris);
+}
+.comment-btn {
+  border-radius: 0.7rem;
+  background: linear-gradient(135deg, var(--color-iris), #6fdfff);
+  padding: 0.65rem 1.2rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: #08091a;
+}
+.comment-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 </style>
