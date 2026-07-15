@@ -14,8 +14,8 @@ import api from './api'
  * conteo se lleva de forma optimista en el cliente.
  */
 export const decisionService = {
-  getDecisions(projectId) {
-    return api.get('/decisions', { params: { projectId } })
+  getDecisions(projectId, q) {
+    return api.get('/decisions', { params: { projectId, q: q || undefined } })
   },
 
   getDecision(projectId, decisionId) {
@@ -39,5 +39,13 @@ export const decisionService = {
   getVotes(decisionId) {
     // -> { decisionId, approve, reject, total, myVote }
     return api.get('/votes', { params: { decisionId } })
+  },
+
+  getComments(decisionId) {
+    return api.get(`/decisions/${decisionId}/comments`)
+  },
+
+  addComment(decisionId, content) {
+    return api.post(`/decisions/${decisionId}/comments`, { content })
   },
 }
