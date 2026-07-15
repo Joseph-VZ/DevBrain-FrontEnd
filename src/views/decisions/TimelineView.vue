@@ -4,6 +4,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { decisionService } from '@/services/decisionService'
 import { projectService } from '@/services/projectService'
 import { statsService } from '@/services/statsService'
+import TeamActivityChart from '@/components/TeamActivityChart.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -303,6 +304,8 @@ onMounted(loadTimeline)
         </article>
       </template>
     </div>
+
+      <TeamActivityChart :project-id="projectId" class="mt-6" />
 
       <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <h2 class="font-display text-2xl font-bold">
