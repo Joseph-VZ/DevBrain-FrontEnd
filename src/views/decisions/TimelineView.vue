@@ -5,6 +5,7 @@ import { decisionService } from '@/services/decisionService'
 import { projectService } from '@/services/projectService'
 import { statsService } from '@/services/statsService'
 import TeamActivityChart from '@/components/TeamActivityChart.vue'
+import DecisionChart from '@/components/DecisionChart.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -306,7 +307,8 @@ onMounted(loadTimeline)
     </div>
 
       <TeamActivityChart :project-id="projectId" class="mt-6" />
-
+      <DecisionChart :project-id="projectId" />
+      
       <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <h2 class="font-display text-2xl font-bold">
           {{ decisions.length }} {{ decisions.length === 1 ? 'decisión' : 'decisiones' }}
