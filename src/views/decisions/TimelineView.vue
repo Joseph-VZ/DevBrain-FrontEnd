@@ -3,6 +3,9 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { decisionService } from '@/services/decisionService'
 import { projectService } from '@/services/projectService'
+import { statsService } from '@/services/statsService'
+import TeamActivityChart from '@/components/TeamActivityChart.vue'
+import DecisionChart from '@/components/DecisionChart.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -23,6 +26,8 @@ const inviteRole = ref('colaborador')
 const inviteError = ref('')
 const inviteOk = ref('')
 const isInviting = ref(false)
+const stats = ref({ totalDecisions: 0, totalVotes: 0, activeMembers: 0 })
+const statsLoading = ref(true)
 
 const projectName = computed(() => project.value?.name || project.value?.nombre || 'Proyecto')
 
@@ -127,21 +132,27 @@ const searchQuery = ref('')
 async function loadTimeline() {
   isLoading.value = true
   errorMessage.value = ''
+  statsLoading.value = true
 
   try {
-    const [decisionsResponse, projectsResponse] = await Promise.all([
+    const [decisionsResponse, projectsResponse, statsResponse] = await Promise.all([
       decisionService.getDecisions(projectId.value, searchQuery.value.trim()),
       projectService.getProjects().catch(() => ({ data: [] })),
+      // Ajustamos el valor por defecto aquí también
+      statsService.getProjectStats(projectId.value).catch(() => ({ 
+        data: { totalDecisiones: 0, totalVotos: 0, totalMiembros: 0 } 
+      }))
     ])
 
     decisions.value = decisionsResponse.data
-    project.value = projectsResponse.data.find(
-      (item) => String(item.id) === String(projectId.value),
-    )
+    // Asignamos directamente la respuesta del servidor
+    stats.value = statsResponse.data 
+    project.value = projectsResponse.data.find((item) => String(item.id) === String(projectId.value))
   } catch (error) {
-    errorMessage.value = error.response?.data?.error || 'No se pudieron cargar las decisiones.'
+    errorMessage.value = 'No se pudieron cargar los datos del proyecto.'
   } finally {
     isLoading.value = false
+    statsLoading.value = false
   }
 }
 
@@ -277,6 +288,27 @@ onMounted(loadTimeline)
         </RouterLink>
       </div>
 
+          <div class="mt-6 grid gap-4 sm:grid-cols-3">
+      <div v-if="statsLoading" v-for="i in 3" :key="i" class="skeleton-card"></div>
+      <template v-else>
+        <article class="stat-card">
+          <span>Total Decisiones</span>
+          <strong>{{ stats.totalDecisiones }}</strong>
+        </article>
+        <article class="stat-card">
+          <span>Total Votos</span>
+          <strong>{{ stats.totalVotos }}</strong>
+        </article>
+        <article class="stat-card">
+          <span>Miembros Activos</span>
+          <strong>{{ stats.totalMiembros }}</strong>
+        </article>
+      </template>
+    </div>
+
+      <TeamActivityChart :project-id="projectId" class="mt-6" />
+      <DecisionChart :project-id="projectId" />
+      
       <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <h2 class="font-display text-2xl font-bold">
           {{ decisions.length }} {{ decisions.length === 1 ? 'decisión' : 'decisiones' }}
@@ -725,5 +757,22 @@ onMounted(loadTimeline)
     flex-direction: column;
     padding: 1.35rem;
   }
+}
+.stat-card {
+  border-radius: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(17, 19, 43, 0.72);
+  padding: 1.1rem;
+}
+.stat-card span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+.stat-card strong {
+  margin-top: 0.35rem;
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.7rem;
 }
 </style>
